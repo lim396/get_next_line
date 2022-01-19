@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <unistd.h>
-#include <errno.h>
+//#include <errno.h>
+#include <bool.h>
 #include "get_next_line.h"
 
 size_t	ft_strlen(const char *str)
@@ -36,7 +37,7 @@ char	*ft_strchr(const char *s, int c)
 	return (pos_c);
 }
 
-ssize_t search_len(const char *s, int c)
+ssize_t searched_len(const char *s, int c)
 {
 	char	find_c;
 	ssize_t i;
@@ -61,11 +62,7 @@ char *strnappend(char *s1, char *s2, size_t n)
 	char	*tmp;
 	
 	if (!*s1 && !*s2)
-	{
-		//free(s1);
-		//free(s2);
 		return (NULL);
-	}
 	new_arr_size = ft_strlen(s1) + n + 1;
 	arr_head = (char *)malloc(new_arr_size + 1);
 	if (!arr_head)
@@ -76,18 +73,8 @@ char *strnappend(char *s1, char *s2, size_t n)
 	while (*s2 && n--)
 		*tmp++ = *s2++;
 	*tmp = '\0';
-	//free(s1);
-	//s1 = NULL;
 	return (arr_head);
 }
-
-/*void	free_line_and_save(char *save, char *line)
-{
-	free(save);
-	save = NULL;
-	free(line);
-	line = NULL;
-}*/
 
 char *ft_strcpy(char *dest, const char *src)
 {
@@ -118,11 +105,6 @@ char *save_after_newline(char *buf, ssize_t new_line_pos, char *line)
 {
 	char	*save;
 
-	//if (!*buf)
-	//{
-	//	free(buf);
-	//	return (NULL);
-	//}
 	if (!ft_strchr(line, '\n'))
 	{
 		free(buf);
@@ -143,32 +125,6 @@ char *save_after_newline(char *buf, ssize_t new_line_pos, char *line)
 	return (save);
 }
 
-/*ssize_t append_save_buf(char **save, char *buf)
-{
-	char	*line;
-	char	*tmp;
-	ssize_t new_line_pos;
-
-	new_line_pos = search_len(buf, '\n');
-	if (!strchr(buf, '\n'))
-		tmp = strnappend(*save, buf, new_line_pos);
-	if (!tmp)
-		return (-1);
-	*line = tmp;
-	free(tmp);
-	tmp = NULL;
-	if (buf[new_line_pos] == '\n')
-	{
-		tmp = ft_strdup(buf + new_line_pos + 1);
-		if (!tmp)
-			return (-1);
-	}
-	free(*save);
-	*save = tmp;
-	free(tmp);
-	return (read_byts);
-}*/
-
 char	*read_and_throw(int fd, char *buf, char *save_fd)
 {
 	ssize_t	read_byts;
@@ -176,7 +132,7 @@ char	*read_and_throw(int fd, char *buf, char *save_fd)
 	
 	while (!ft_strchr(save_fd, '\n'))
 	{	
-		read_byts = read(fd, buf, BUFFER_SIZE); // cut func read_and_throw
+		read_byts = read(fd, buf, BUFFER_SIZE);
 		if (read_byts < 0)
 		{
 			free(save_fd);
@@ -198,7 +154,7 @@ char	*read_and_throw(int fd, char *buf, char *save_fd)
 	return (save_fd);
 }
 
-int	null_check(char *checked, char *released) //bool
+bool	null_check(char *checked, char *released)
 {
 	if (!checked)
 	{
@@ -206,45 +162,35 @@ int	null_check(char *checked, char *released) //bool
 		save = NULL;
 		free(line);
 		line = NULL;
-		return (1);		
+		return (true);		
 	}
-	return (0);
+	return (false);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*save[257]; //256?
-	//ssize_t		read_byts;
+	static char	*save[257];
 	char		*line;
 	char		*buf;
 	size_t		newline_pos;
 	char		*tmp;
-	//char		*temp;
 
 	if (fd < 0 || 256 < fd || BUFFER_SIZE <= 0)
 		return (NULL);
-	buf = (char *)malloc(BUFFER_SIZE + 1);// cut func reserve_mem
+	buf = (char *)malloc(BUFFER_SIZE + 1);m
 	if (!buf)
 		return (NULL);
 	line = ft_strdup("");
 	save[fd] = read_and_throw(fd, buf, save[fd]);
 	free(buf);
-	//buf = NULL;
 	if (null_check(save[fd], line))
 		return (NULL);
-	newline_pos = search_len(save[fd], '\n');
+	newline_pos = searched_len(save[fd], '\n');
 	tmp = line;
 	line = strnappend(line, save[fd], newline_pos + 1);
 	free(tmp);
-	//tmp = NULL;
 	if (null_check(line, save[fd]))
 		return (NULL);
-	//tmp = save[fd];
-	//temp = save[fd];
 	save[fd] = save_after_newline(save[fd], newline_pos, line);
-	//free(temp);
-	//temp = NULL;
-	//if (!line)
-	//	free_line_and_save(save[fd], line);
 	return (line);
 }
