@@ -28,7 +28,7 @@ char	*strnappend(char *s1, char *s2, size_t n)
 		return (NULL);
 	i = 0;
 	j = 0;
-	ret_arr = (char *)malloc(sizeof(char) * (ft_strlen(s1) + n + 1));
+	ret_arr = (char *)malloc((ft_strlen(s1) + n + 1) * sizeof(char));
 	if (!ret_arr)
 		return (NULL);
 	while (s1[i])
@@ -42,83 +42,83 @@ char	*strnappend(char *s1, char *s2, size_t n)
 	return (ret_arr);
 }
 
-char	*save_after_newline(char *buf, ssize_t new_line_pos, char *line)
+char	*save_after_newline(char **buf, ssize_t new_line_pos, char **line)
 {
 	char	*save;
 
-	if (!ft_strchr(line, '\n'))
+	if (!ft_strchr(*line, '\n'))
 	{
-		free(buf);
-		buf = NULL;
+		free(*buf);
+		*buf = NULL;
 		return (NULL);
 	}
-	save = ft_strdup(buf + new_line_pos + 1);
+	save = ft_strdup(*buf + new_line_pos + 1);
 	if (!save)
 	{
-		free(buf);
-		buf = NULL;
-		free(line);
-		line = NULL;
+		free(*buf);
+		*buf = NULL;
+		free(*line);
+		*line = NULL;
 		return (NULL);
 	}
-	free(buf);
-	buf = NULL;
+	free(*buf);
+	*buf = NULL;
 	return (save);
 }
 
-char	*read_and_throw(int fd, char *buf, char *save_fd)
+char	*read_and_throw(int fd, char *buf, char **save_fd)
 {
 	ssize_t	read_byts;
 	char	*tmp;
 
-	while (!ft_strchr(save_fd, '\n'))
+	while (!ft_strchr(*save_fd, '\n'))
 	{	
 		read_byts = read(fd, buf, BUFFER_SIZE);
 		if (read_byts < 0)
 		{
-			free(save_fd);
+			free(*save_fd);
 			return (NULL);
 		}
 		if (read_byts == 0)
 			break ;
 		buf[read_byts] = '\0';
-		tmp = save_fd;
-		if (save_fd)
-			save_fd = strnappend(save_fd, buf, read_byts);
+		tmp = *save_fd;
+		if (*save_fd)
+			*save_fd = strnappend(*save_fd, buf, read_byts);
 		else
-			save_fd = ft_strdup(buf);
+			*save_fd = ft_strdup(buf);
 		free(tmp);
 		tmp = NULL;
 		if (!save_fd)
 			return (NULL);
 	}
-	return (save_fd);
+	return (*save_fd);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*save[OPEN_MAX + 1];
+	static char	*save;
 	char		*line;
 	char		*buf;
 	size_t		newline_pos;
 	char		*tmp;
 
-	if (fd < 0 || OPEN_MAX < fd || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd > FD_MAX - 1 || BUFFER_SIZE <= 0)
 		return (NULL);
-	buf = (char *)malloc(BUFFER_SIZE + 1);
+	buf = (char *)malloc(((size_t)BUFFER_SIZE + 1u) * sizeof(char));
 	line = ft_strdup("");
-	if (null_check(buf, line) || null_check(line, buf))
+	if (null_check(&buf, &line) || null_check(&line, &buf))
 		return (NULL);
-	save[fd] = read_and_throw(fd, buf, save[fd]);
+	save = read_and_throw(fd, buf, &save);
 	free(buf);
-	if (null_check(save[fd], line))
+	if (null_check(&save, &line))
 		return (NULL);
-	newline_pos = searched_len(save[fd], '\n');
+	newline_pos = searched_len(save, '\n');
 	tmp = line;
-	line = strnappend(line, save[fd], newline_pos + 1);
+	line = strnappend(line, save, newline_pos + 1);
 	free(tmp);
-	if (null_check(line, save[fd]))
+	if (null_check(&line, &save))
 		return (NULL);
-	save[fd] = save_after_newline(save[fd], newline_pos, line);
+	save = save_after_newline(&save, newline_pos, &line);
 	return (line);
 }

@@ -57,14 +57,14 @@ char	*ft_strdup(const char *s1)
 	return (cpy_head);
 }
 
-bool	null_check(char *checked, char *released)
+bool	null_check(char **checked, char **released)
 {
-	if (!checked)
+	if (!*checked)
 	{
-		free(checked);
-		checked = NULL;
-		free(released);
-		released = NULL;
+		free(*checked);
+		*checked = NULL;
+		free(*released);
+		*released = NULL;
 		return (true);
 	}
 	return (false);
