@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: shongou <shongou@student.42tokyo.jp>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/02/03 19:10:32 by shongou           #+#    #+#             */
+/*   Updated: 2022/02/03 19:10:38 by shongou          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
 ssize_t	searched_len(const char *s, int c)
@@ -72,7 +84,7 @@ char	*read_and_throw(int fd, char *buf, char **save_fd)
 	char	*tmp;
 
 	while (!ft_strchr(*save_fd, '\n'))
-	{	
+	{
 		read_byts = read(fd, buf, BUFFER_SIZE);
 		if (read_byts < 0)
 		{
