@@ -62,7 +62,7 @@ char	*ft_strdup(const char *s1)
 {
 	char	*cpy_head;
 
-	cpy_head = (char *)malloc(sizeof(char) * (ft_strlen(s1) + 1));
+	cpy_head = (char *)malloc((ft_strlen(s1) + 1) * sizeof(char));
 	if (!cpy_head)
 		return (NULL);
 	cpy_head = ft_strcpy(cpy_head, s1);

@@ -12,10 +12,10 @@
 
 #include "get_next_line.h"
 
-ssize_t	searched_len(const char *s, int c)
+static size_t	searched_len(const char *s, int c)
 {
 	char	find_c;
-	ssize_t	i;
+	size_t	i;
 
 	if (!s)
 		return (0);
@@ -30,7 +30,7 @@ ssize_t	searched_len(const char *s, int c)
 	return (i);
 }
 
-char	*strnappend(char *s1, char *s2, size_t n)
+static char	*strnappend(char *s1, char *s2, size_t n)
 {
 	char	*ret_arr;
 	size_t	i;
@@ -54,7 +54,7 @@ char	*strnappend(char *s1, char *s2, size_t n)
 	return (ret_arr);
 }
 
-char	*save_after_newline(char **buf, ssize_t new_line_pos, char **line)
+static char	*save_after_newline(char **buf, ssize_t new_line_pos, char **line)
 {
 	char	*save;
 
@@ -78,7 +78,7 @@ char	*save_after_newline(char **buf, ssize_t new_line_pos, char **line)
 	return (save);
 }
 
-char	*read_and_throw(int fd, char *buf, char **save_fd)
+static char	*read_and_throw(int fd, char *buf, char **save_fd)
 {
 	ssize_t	read_byts;
 	char	*tmp;
